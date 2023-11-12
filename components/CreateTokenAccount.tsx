@@ -145,35 +145,33 @@ export const CreateTokenAccountForm: FC = () => {
     mintPublicKey: web3.PublicKey,
     accountOwnerPublicKey: web3.PublicKey) {
     const associatedTokenAccountAddress = await getAssociatedTokenAddress(mintPublicKey, accountOwnerPublicKey, false);
-    const accountInfo = connection.getAccountInfo(associatedTokenAccountAddress)
-    .then((info) => {
-      if (info != null) {
-        setTokenAccount(associatedTokenAccountAddress.toString());
-        return alert(
-        'Associated token account address for mint already exists. Click ok and see account address below.');
-      }
+    const accountInfo = await connection.getAccountInfo(associatedTokenAccountAddress)
+    if (accountInfo != null) {
+      setTokenAccount(associatedTokenAccountAddress.toString());
+      return alert(
+      'Associated token account address for mint already exists. Click ok and see account address below.');
+    }
   
-      // https://solana-labs.github.io/solana-program-library/token/js/functions/createAssociatedTokenAccountInstruction.html
-      const transaction = new web3.Transaction().add(
-        createAssociatedTokenAccountInstruction(
-          publicKey,
-          associatedTokenAccountAddress,
-          accountOwnerPublicKey,
-          mintPublicKey,
-          TOKEN_PROGRAM_ID,
-          ASSOCIATED_TOKEN_PROGRAM_ID,
-        )
+    // https://solana-labs.github.io/solana-program-library/token/js/functions/createAssociatedTokenAccountInstruction.html
+    const transaction = new web3.Transaction().add(
+      createAssociatedTokenAccountInstruction(
+        publicKey,
+        associatedTokenAccountAddress,
+        accountOwnerPublicKey,
+        mintPublicKey,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID,
       )
+    )
 
-      try {
-        sendTransaction(transaction, connection)
-        .then((sig) => {
-          setTokenAccountAndSignature(associatedTokenAccountAddress, sig);
-        });
-      } catch (error) {
-        alert(JSON.stringify(error));
-      }
-    });
+    try {
+      sendTransaction(transaction, connection)
+      .then((sig) => {
+        setTokenAccountAndSignature(associatedTokenAccountAddress, sig);
+      });
+    } catch (error) {
+      alert(JSON.stringify(error));
+    }
   }
 
   function setTokenAccountAndSignature(
@@ -183,6 +181,5 @@ export const CreateTokenAccountForm: FC = () => {
     const tokenAccountPublicKeyString = tokenAccountPublicKey.toString();
     setTokenAccount(tokenAccountPublicKeyString);
     setTxSig(signature);
-    console.log(signature);
   }
 };

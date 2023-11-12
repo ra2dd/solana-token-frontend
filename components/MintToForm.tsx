@@ -41,7 +41,7 @@ export const MintToForm: FC = () => {
       ASSOCIATED_TOKEN_PROGRAM_ID
     );
 
-    const accountInfo = await connection.getAccountInfo(associatedTokenAccountAddress)
+    const accountInfo = await connection.getAccountInfo(associatedTokenAccountAddress);
     if (accountInfo == null) {
       return alert(
       "Associated token account address for mint doesn't exists. Create token account and try again.");
@@ -54,14 +54,17 @@ export const MintToForm: FC = () => {
         publicKey,
         parseInt(event.target.amount.value) * (10 ** decimals)
       )
-    )
-  
-    const signature = await sendTransaction(transaction, connection)
-    await connection.confirmTransaction(signature, "confirmed");
+    );
 
-    setTxSig(signature);
-    const tokenAccountData = await getAccount(connection, associatedTokenAccountAddress)
-    setBalance(parseInt(tokenAccountData.amount.toString()) / (10 ** decimals));
+    try {
+      const signature = await sendTransaction(transaction, connection);
+      await connection.confirmTransaction(signature, "confirmed");
+      setTxSig(signature);
+      const tokenAccountData = await getAccount(connection, associatedTokenAccountAddress);
+      setBalance(parseInt(tokenAccountData.amount.toString()) / (10 ** decimals));
+    } catch (error) {
+      alert(JSON.stringify(error));
+    }
   };
 
   return (
