@@ -9,6 +9,8 @@ import {
   createInitializeMintInstruction,
 } from "@solana/spl-token";
 
+export const decimals = 2;
+
 export const CreateMintForm: FC = () => {
   const [txSig, setTxSig] = useState("");
   const [mint, setMint] = useState("");
@@ -30,7 +32,6 @@ export const CreateMintForm: FC = () => {
     // BUILD AND SEND CREATE MINT TRANSACTION HERE
     const lamports = await getMinimumBalanceForRentExemptMint(connection);
     const mintAccountKeypair = web3.Keypair.generate();
-    const decimals = 2;
 
     const transaction = new web3.Transaction().add(
       web3.SystemProgram.createAccount({
@@ -63,8 +64,7 @@ export const CreateMintForm: FC = () => {
   };
 
   useEffect(() => {
-    const mintPublicKey = JSON.parse(localStorage.getItem('mint')) 
-    console.log(mintPublicKey);
+    const mintPublicKey = JSON.parse(localStorage.getItem('mint')); 
     if (mintPublicKey) {
       setMint(mintPublicKey);
     }
